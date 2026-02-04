@@ -47,6 +47,24 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        earth: {
+          DEFAULT: "hsl(var(--earth-brown))",
+          light: "hsl(var(--earth-light))",
+        },
+        leaf: {
+          DEFAULT: "hsl(var(--leaf-green))",
+          light: "hsl(var(--leaf-light))",
+        },
+        sun: {
+          DEFAULT: "hsl(var(--sun-gold))",
+          light: "hsl(var(--sun-light))",
+        },
+        water: {
+          DEFAULT: "hsl(var(--water-blue))",
+          light: "hsl(var(--water-light))",
+        },
+        warning: "hsl(var(--warning-orange))",
+        danger: "hsl(var(--danger-red))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -57,6 +75,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        sans: ['Poppins', 'sans-serif'],
+      },
+      fontSize: {
+        'farmer-xl': ['1.75rem', { lineHeight: '2.25rem', fontWeight: '700' }],
+        'farmer-lg': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
+        'farmer-base': ['1.125rem', { lineHeight: '1.75rem', fontWeight: '400' }],
       },
       borderRadius: {
         lg: "var(--radius)",
