@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface DetectionResult {
   name: string;
@@ -20,34 +22,6 @@ interface DetectionResult {
   description: string;
   remedy: string;
 }
-
-const mockDetect = (): Promise<DetectionResult[]> =>
-  new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve([
-          {
-            name: "Leaf Blight",
-            confidence: 92,
-            severity: "high",
-            description:
-              "Fungal infection causing brown spots and wilting of leaves. Spreads rapidly in humid conditions.",
-            remedy:
-              "Apply copper-based fungicide (2g/L). Remove and burn affected leaves. Improve air circulation between plants.",
-          },
-          {
-            name: "Aphid Infestation",
-            confidence: 78,
-            severity: "medium",
-            description:
-              "Small green insects clustering on undersides of leaves, causing curling and yellowing.",
-            remedy:
-              "Spray neem oil solution (5ml/L). Introduce ladybugs as natural predators. Avoid excessive nitrogen fertilizer.",
-          },
-        ]),
-      2500
-    )
-  );
 
 const severityConfig = {
   low: { color: "text-leaf", bg: "bg-leaf-light", label: "Low Risk" },
@@ -65,6 +39,10 @@ const PestDetection = () => {
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Please upload an image under 10MB.", variant: "destructive" });
+      return;
+    }
     setFileName(file.name);
     setResults(null);
     const reader = new FileReader();
@@ -83,10 +61,34 @@ const PestDetection = () => {
   );
 
   const analyze = async () => {
+    if (!image) return;
     setIsAnalyzing(true);
-    const res = await mockDetect();
-    setResults(res);
-    setIsAnalyzing(false);
+    try {
+      const { data, error } = await supabase.functions.invoke("pest-detection", {
+        body: { imageBase64: image },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Analysis failed");
+      }
+
+      if (data?.error) {
+        toast({ title: "Analysis Error", description: data.error, variant: "destructive" });
+        setIsAnalyzing(false);
+        return;
+      }
+
+      setResults(data.detections || []);
+    } catch (err: any) {
+      console.error("Pest detection error:", err);
+      toast({
+        title: "Analysis Failed",
+        description: err.message || "Could not analyze the image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const reset = () => {
@@ -134,6 +136,7 @@ const PestDetection = () => {
               ref={fileRef}
               type="file"
               accept="image/*"
+              capture="environment"
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0];
@@ -220,6 +223,14 @@ const PestDetection = () => {
                   </h3>
                 </div>
 
+                {results.length === 0 && (
+                  <div className="farmer-card text-center py-8">
+                    <ShieldCheck className="w-12 h-12 text-leaf mx-auto mb-3" />
+                    <p className="text-lg font-bold text-foreground">No issues detected!</p>
+                    <p className="text-muted-foreground">Your crop looks healthy.</p>
+                  </div>
+                )}
+
                 {results.map((r, i) => {
                   const sev = severityConfig[r.severity];
                   return (
@@ -238,9 +249,7 @@ const PestDetection = () => {
                       {/* Header */}
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <AlertTriangle
-                            className={`w-6 h-6 ${sev.color}`}
-                          />
+                          <AlertTriangle className={`w-6 h-6 ${sev.color}`} />
                           <h4 className="text-lg font-bold text-foreground">
                             {r.name}
                           </h4>
@@ -255,12 +264,8 @@ const PestDetection = () => {
                       {/* Confidence Bar */}
                       <div className="mb-4">
                         <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-muted-foreground">
-                            Confidence
-                          </span>
-                          <span className="font-bold text-foreground">
-                            {r.confidence}%
-                          </span>
+                          <span className="text-muted-foreground">Confidence</span>
+                          <span className="font-bold text-foreground">{r.confidence}%</span>
                         </div>
                         <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                           <div
@@ -271,9 +276,7 @@ const PestDetection = () => {
                       </div>
 
                       {/* Description */}
-                      <p className="text-muted-foreground text-sm mb-4">
-                        {r.description}
-                      </p>
+                      <p className="text-muted-foreground text-sm mb-4">{r.description}</p>
 
                       {/* Remedy */}
                       <div className="bg-leaf-light/50 rounded-2xl p-4">
