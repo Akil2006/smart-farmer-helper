@@ -85,17 +85,27 @@ const Index = () => {
               Ready to Improve Your Farming?
             </h3>
             <p className="text-lg text-muted-foreground mb-8">
-              Just answer a few simple questions about your soil and we'll give you expert advice.
+              Access your smart dashboard for crop advice, pest detection, and more.
             </p>
-            <Button
-              variant="farmer"
-              size="xl"
-              onClick={() => navigate("/input")}
-              className="w-full sm:w-auto"
-            >
-              Get Smart Farming Advice
-              <ArrowRight className="w-7 h-7" />
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                variant="farmer"
+                size="xl"
+                onClick={() => navigate("/dashboard")}
+                className="w-full sm:w-auto"
+              >
+                Open Dashboard
+                <ArrowRight className="w-7 h-7" />
+              </Button>
+              <Button
+                variant="farmerOutline"
+                size="lg"
+                onClick={() => navigate("/input")}
+                className="w-full sm:w-auto"
+              >
+                Get Soil Advice
+              </Button>
+            </div>
           </div>
         </div>
       </section>
