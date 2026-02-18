@@ -11,6 +11,33 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 
+const farmPulseItems = [
+  {
+    icon: Sprout,
+    title: "Best Crop",
+    description: "Know which crop will grow best in your soil and season",
+    link: "/input",
+  },
+  {
+    icon: Bug,
+    title: "Pest & Disease",
+    description: "Upload a photo to identify pests and diseases instantly",
+    link: "/pest-detection",
+  },
+  {
+    icon: CloudSun,
+    title: "Weather Alerts",
+    description: "Real-time weather updates and forecasts for your farm",
+    link: "/input",
+  },
+  {
+    icon: Droplets,
+    title: "Irrigation Plan",
+    description: "Smart watering schedules based on crop and weather",
+    link: "/input",
+  },
+];
+
 const dashboardItems = [
   {
     icon: Bug,
@@ -102,6 +129,26 @@ const Dashboard = () => {
           ))}
         </div>
 
+        {/* Farm Pulse Section */}
+        <h3 className="text-xl font-bold text-foreground mb-5">Farm Pulse</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          {farmPulseItems.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => navigate(item.link)}
+              className="group farmer-card flex flex-col items-center text-center gap-3 p-6 hover:shadow-xl"
+            >
+              <div className="w-14 h-14 rounded-full bg-leaf-light flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                <item.icon className="w-7 h-7 text-leaf" />
+              </div>
+              <h4 className="text-farmer-lg text-foreground">{item.title}</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {item.description}
+              </p>
+            </button>
+          ))}
+        </div>
+
         {/* Feature Cards Grid */}
         <h3 className="text-xl font-bold text-foreground mb-5">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -111,13 +158,11 @@ const Dashboard = () => {
               onClick={() => navigate(item.link)}
               className={`group relative overflow-hidden rounded-3xl border-2 ${item.border} bg-gradient-to-br ${item.color} p-6 md:p-8 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl active:scale-[0.98]`}
             >
-              {/* Badge */}
               {item.badge && (
                 <span className="absolute top-4 right-4 text-xs font-bold uppercase tracking-wider bg-foreground/10 text-foreground px-3 py-1 rounded-full backdrop-blur-sm">
                   {item.badge}
                 </span>
               )}
-
               <div className="flex items-start gap-5">
                 <div
                   className={`${item.iconBg} w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shrink-0 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110`}
@@ -133,8 +178,6 @@ const Dashboard = () => {
                   </p>
                 </div>
               </div>
-
-              {/* Arrow indicator */}
               <div className="flex justify-end mt-4">
                 <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center transition-all duration-300 group-hover:bg-foreground/10 group-hover:translate-x-1">
                   <ArrowRight className="w-5 h-5 text-foreground/60" />
